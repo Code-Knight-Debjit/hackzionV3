@@ -17,25 +17,17 @@ from honeypot.ai_engine import get_fake_response
 logger = logging.getLogger("honeypot.events")
 
 
-def _emit_event(event: dict):
-    """Emit a structured JSON event for the detection engine."""
-    logger.info(json.dumps(event))
+import httpx
 
+DETECTION_URL = "http://detection:8001"
 
 async def handle_honeypot_request(request: Request, path: str) -> Response:
-    """
-    Main handler called by honeypot/main.py for all routes.
-    1. Generates fake response via fake_vuln_handler
-    2. Emits structured log event
-    3. Returns convincing fake HTTP response
-    """
     ip     = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
     ip     = ip.split(",")[0].strip()
     score  = request.headers.get("X-Risk-Score", "0")
     body   = await request.body()
     query  = str(request.url.query)
 
-    # Determine fake response
     result = handle_path(
         path=f"/{path}",
         method=request.method,
@@ -43,8 +35,7 @@ async def handle_honeypot_request(request: Request, path: str) -> Response:
         body=body,
     )
 
-    # Emit structured event for detection engine
-    _emit_event({
+    event = {
         "ts":        time.time(),
         "ip":        ip,
         "method":    request.method,
@@ -54,9 +45,23 @@ async def handle_honeypot_request(request: Request, path: str) -> Response:
         "score":     score,
         "scenario":  result["scenario"],
         "user_agent": request.headers.get("user-agent", ""),
-    })
+    }
 
-    # Build response
+    # ✅ FIX: POST to detection engine (fire-and-forget, don't block response)
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            detection_resp = await client.post(f"{DETECTION_URL}/analyze", json=event)
+            analysis = detection_resp.json()
+
+            # ✅ FIX: Forward detection result to response engine
+            await client.post("http://response:8002/respond", json=analysis)
+    except Exception as e:
+        logger.error(f"Pipeline error: {e}")  # Don't crash honeypot if pipeline fails
+
+    # Still emit structured log for visibility
+    logger.info(json.dumps(event))
+
+    # Build and return fake response as before
     content_type = result["content_type"]
     body_data    = result["body"]
     status       = result["status_code"]
