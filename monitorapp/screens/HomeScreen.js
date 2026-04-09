@@ -7,7 +7,7 @@ const HomeScreen = ({ navigation }) => {
 
     // Predefined credentials
     const VALID_USERNAME = "admin";
-    const VALID_PASSWORD = "password123";
+    const VALID_PASSWORD = "pass";
 
     const handleLogin = () => {
         if (username === "" || password === "") {
@@ -16,7 +16,6 @@ const HomeScreen = ({ navigation }) => {
         }
 
         if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-            Alert.alert("Success", "Login successful!");
             setUsername("");
             setPassword("");
             navigation.navigate("Main");

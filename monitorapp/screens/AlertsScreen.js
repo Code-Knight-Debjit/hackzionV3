@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Text, StyleSheet, View, ScrollView, TouchableOpacity, Alert } from "react-native";
+import React from "react";
+import { Text, StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 
 const AlertsScreen = ({ navigation }) => {
     const highVulnAttacks = [
@@ -7,16 +7,6 @@ const AlertsScreen = ({ navigation }) => {
         { name: "XSS Attack", severity: "Critical", timestamp: "10:45" },
         { name: "Buffer Overflow", severity: "Critical", timestamp: "11:00" },
     ];
-
-    useEffect(() => {
-        if (highVulnAttacks.length > 0) {
-            Alert.alert(
-                "High Vulnerability Attack Detected",
-                `${highVulnAttacks.length} critical attacks detected!`,
-                [{ text: "Acknowledged" }]
-            );
-        }
-    }, []);
 
     return (
         <View style={styles.container}>

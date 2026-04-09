@@ -1,12 +1,41 @@
-import React from "react";
-import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
+import React, { useEffect } from "react";
+import { Text, StyleSheet, View, TouchableOpacity, Alert } from "react-native";
 
 const MainScreen = ({ navigation }) => {
+    const highVulnAttacks = [
+        { name: "SQL Injection", severity: "Critical", timestamp: "10:30" },
+        { name: "XSS Attack", severity: "Critical", timestamp: "10:45" },
+        { name: "Buffer Overflow", severity: "Critical", timestamp: "11:00" },
+    ];
+
+    useEffect(() => {
+        if (highVulnAttacks.length > 0) {
+            Alert.alert(
+                "High Vulnerability Attack Detected",
+                `${highVulnAttacks.length} critical attacks detected!`,
+                [{ text: "Acknowledged" }]
+            );
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.contentTitle}>Dashboard</Text>
                 <Text style={styles.welcomeText}>Welcome to CyberPulse Security Monitor</Text>
+
+                {highVulnAttacks.length > 0 && (
+                    <View style={styles.alertSection}>
+                        <Text style={styles.alertTitle}>⚠️ High Vulnerability Attacks Detected</Text>
+                        <Text style={styles.alertCount}>{highVulnAttacks.length} critical attacks found</Text>
+                        <TouchableOpacity
+                            style={styles.alertButton}
+                            onPress={() => navigation.navigate('Alerts')}
+                        >
+                            <Text style={styles.alertButtonText}>Click here to view them</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
 
             <View style={styles.bottomNav}>
@@ -59,6 +88,43 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "#666",
         textAlign: "center",
+        marginBottom: 30,
+    },
+    alertSection: {
+        backgroundColor: "#FF6B6B",
+        padding: 20,
+        borderRadius: 10,
+        width: "100%",
+        maxWidth: 350,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        elevation: 5,
+    },
+    alertTitle: {
+        fontSize: 18,
+        color: "white",
+        fontWeight: "bold",
+        marginBottom: 8,
+    },
+    alertCount: {
+        fontSize: 14,
+        color: "white",
+        marginBottom: 15,
+        opacity: 0.9,
+    },
+    alertButton: {
+        backgroundColor: "white",
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    alertButtonText: {
+        color: "#FF6B6B",
+        fontSize: 16,
+        fontWeight: "bold",
     },
     bottomNav: {
         flexDirection: "row",
