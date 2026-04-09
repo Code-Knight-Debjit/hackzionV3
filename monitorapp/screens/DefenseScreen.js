@@ -15,7 +15,7 @@ const DefenseScreen = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.contentTitle}>Defense Actions</Text>
-                <Text style={{color:'black', marginBottom:10}}>Logs provided by the defence model, along with the solution used.</Text>
+                <Text style={styles.descriptionText}>Logs provided by the defence model, along with the solution used.</Text>
                 <ScrollView>
                     {defenseLogs.map((log, index) => (
                         <View key={index} style={styles.logItem}>
@@ -61,7 +61,7 @@ const DefenseScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#FAF9F6",
+        backgroundColor: "#10141a",
     },
     content: {
         flex: 1,
@@ -75,15 +75,15 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     logItem: {
-        backgroundColor: "#E5FFE5",
+        backgroundColor: "#171d26",
         padding: 15,
         marginBottom: 10,
-        borderRadius: 5,
+        borderRadius: 12,
         flexDirection: "row",
     },
     logTime: {
         fontSize: 12,
-        color: "#666",
+        color: "#8b97ad",
         width: 70,
     },
     logDetails: {
@@ -92,12 +92,12 @@ const styles = StyleSheet.create({
     },
     logText: {
         fontSize: 16,
-        color: "#333",
+        color: "#FFFFFF",
         fontWeight: "500",
     },
     target: {
         fontSize: 12,
-        color: "#999",
+        color: "#A0A6B5",
         marginTop: 5,
     },
     bottomNav: {
@@ -120,6 +120,11 @@ const styles = StyleSheet.create({
         color: "#999",
         fontSize: 12,
         fontWeight: "600",
+    },
+    descriptionText: {
+        color: "#A0A6B5",
+        fontSize: 14,
+        marginBottom: 10,
     },
     navTextActive: {
         color: "#00BFFF",

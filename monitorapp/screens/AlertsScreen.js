@@ -12,7 +12,7 @@ const AlertsScreen = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.contentTitle}>High Vulnerability Alerts</Text>
-                <Text style={{color:'black', marginBottom:10}}>List of critical attacks that were unable to be processed by the AI model.</Text>
+                <Text style={styles.descriptionText}>List of critical attacks that were unable to be processed by the AI model.</Text>
                 <ScrollView>
                     {highVulnAttacks.map((alert, index) => (
                         <View key={index} style={styles.alertItem}>
@@ -61,7 +61,7 @@ const AlertsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#FAF9F6",
+        backgroundColor: "#10141a",
     },
     content: {
         flex: 1,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     contentTitle: {
         fontSize: 28,
         fontWeight: "bold",
-        color: "#e81515",
+        color: "#FF6B6B",
         marginBottom: 10,
         marginTop: 20,
         fontFamily: 'Inter',
@@ -135,6 +135,11 @@ const styles = StyleSheet.create({
         color: "#999",
         fontSize: 12,
         fontWeight: "600",
+    },
+    descriptionText: {
+        color: "#A0A6B5",
+        fontSize: 14,
+        marginBottom: 10,
     },
     navTextActive: {
         color: "#00BFFF",

@@ -15,7 +15,7 @@ const AttacksScreen = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.contentTitle}>Attack Logs</Text>
-                <Text style={{color:'black', marginBottom:10}}>Different attacks tried by the model, along with its logs & level of attack.</Text>
+                <Text style={styles.descriptionText}>Different attacks tried by the model, along with its logs & level of attack.</Text>
                 <ScrollView>
                     {attackLogs.map((log, index) => (
                         <View key={index} style={styles.logItem}>
@@ -61,7 +61,7 @@ const AttacksScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#FAF9F6",
+        backgroundColor: "#10141a",
     },
     content: {
         flex: 1,
@@ -75,27 +75,27 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     logItem: {
-        backgroundColor: "#FFE5E5",
+        backgroundColor: "#171d26",
         padding: 15,
         marginBottom: 10,
-        borderRadius: 5,
+        borderRadius: 12,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
     logTime: {
         fontSize: 12,
-        color: "#666",
+        color: "#8b97ad",
     },
     logText: {
         fontSize: 16,
-        color: "#333",
+        color: "#FFFFFF",
         flex: 1,
         marginLeft: 10,
     },
     severity: {
         fontSize: 12,
-        color: "#FF9800",
+        color: "#FFA500",
         fontWeight: "bold",
     },
     severityHigh: {
@@ -121,6 +121,11 @@ const styles = StyleSheet.create({
         color: "#999",
         fontSize: 12,
         fontWeight: "600",
+    },
+    descriptionText: {
+        color: "#A0A6B5",
+        fontSize: 14,
+        marginBottom: 10,
     },
     navTextActive: {
         color: "#00BFFF",
