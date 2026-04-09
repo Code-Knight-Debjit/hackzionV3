@@ -15,6 +15,7 @@ const DefenseScreen = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.contentTitle}>Defense Actions</Text>
+                <Text style={{color:'black', marginBottom:10}}>Logs provided by the defence model, along with the solution used.</Text>
                 <ScrollView>
                     {defenseLogs.map((log, index) => (
                         <View key={index} style={styles.logItem}>
@@ -71,6 +72,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#4CAF50",
         marginBottom: 15,
+        marginTop: 20,
     },
     logItem: {
         backgroundColor: "#E5FFE5",

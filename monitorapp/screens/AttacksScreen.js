@@ -15,6 +15,7 @@ const AttacksScreen = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.contentTitle}>Attack Logs</Text>
+                <Text style={{color:'black', marginBottom:10}}>Different attacks tried by the model, along with its logs & level of attack.</Text>
                 <ScrollView>
                     {attackLogs.map((log, index) => (
                         <View key={index} style={styles.logItem}>
@@ -71,6 +72,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#FF6B6B",
         marginBottom: 15,
+        marginTop: 20,
     },
     logItem: {
         backgroundColor: "#FFE5E5",

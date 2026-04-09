@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Text, StyleSheet, View, TouchableOpacity, Alert } from "react-native";
+import Feather from '@expo/vector-icons/Feather';
 
 const MainScreen = ({ navigation }) => {
     const highVulnAttacks = [
@@ -20,6 +21,13 @@ const MainScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Home')}
+                >
+                    <Feather name="log-out" size={24} color="black" />
+                </TouchableOpacity>
+            </View>
             <View style={styles.content}>
                 <Text style={styles.contentTitle}>Dashboard</Text>
                 <Text style={styles.welcomeText}>Welcome to CyberPulse Security Monitor</Text>
@@ -72,6 +80,22 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#FAF9F6",
     },
+    header: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        padding: 20,
+        paddingTop: 40,
+    },
+    logoutButton: {
+        backgroundColor: "#FF6B6B",
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    logoutIcon: {
+        fontSize: 24,
+        color: "white",
+    },
     content: {
         flex: 1,
         justifyContent: "center",
@@ -83,6 +107,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#FF6B6B",
         marginBottom: 15,
+        marginTop: -100,
     },
     welcomeText: {
         fontSize: 16,

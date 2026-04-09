@@ -39,6 +39,8 @@ const HomeScreen = ({ navigation }) => {
                         placeholderTextColor="#999"
                         value={username}
                         onChangeText={setUsername}
+                        autoCorrect={false}
+                        autoCapitalize="none"
                     />
 
                     <Text style={styles.label}>Password</Text>
@@ -57,7 +59,7 @@ const HomeScreen = ({ navigation }) => {
 
                     <Text style={styles.credentialsText}>Demo Credentials:</Text>
                     <Text style={styles.credentialsInfo}>Username: admin</Text>
-                    <Text style={styles.credentialsInfo}>Password: password123</Text>
+                    <Text style={styles.credentialsInfo}>Password: pass</Text>
                 </View>
             </View>
         </View>
