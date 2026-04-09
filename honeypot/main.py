@@ -1,26 +1,28 @@
 # honeypot/main.py
 
+import logging
+import sys
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-import time
+from honeypot.ai_handler import handle_honeypot_request
 
-app = FastAPI(title="HackzionV3 Honeypot", version="1.0.0")
+# ── Structured JSON logging (stdout → Docker → detection can tail) ─────────
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format="%(message)s",   # Raw JSON lines — no extra prefix
+)
+
+app = FastAPI(title="HackzionV3 Honeypot", version="2.0.0")
 
 
-@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
-async def honeypot_catch_all(request: Request, path: str = ""):
-    """
-    Honeypot handler — receives high-risk traffic.
-    Responds slowly and with convincing-but-fake data.
-    In production this would log attacker behaviour in detail.
-    """
-    time.sleep(0.5)  # Artificial delay to waste attacker time
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": "honeypot"}
 
-    return JSONResponse({
-        "backend":   "HONEYPOT",
-        "path":      f"/{path}",
-        "method":    request.method,
-        "client_ip": request.headers.get("X-Real-IP", "unknown"),
-        "score":     request.headers.get("X-Risk-Score", "unknown"),
-        "message":   "Welcome. Your actions are being recorded.",
-    }, status_code=200)
+
+@app.api_route(
+    "/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+)
+async def catch_all(request: Request, path: str = ""):
+    return await handle_honeypot_request(request, path)
