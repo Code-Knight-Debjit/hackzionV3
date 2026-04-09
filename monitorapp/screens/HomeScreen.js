@@ -56,10 +56,6 @@ const HomeScreen = ({ navigation }) => {
                     <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                         <Text style={styles.loginButtonText}>Login</Text>
                     </TouchableOpacity>
-
-                    <Text style={styles.credentialsText}>Demo Credentials:</Text>
-                    <Text style={styles.credentialsInfo}>Username: admin</Text>
-                    <Text style={styles.credentialsInfo}>Password: pass</Text>
                 </View>
             </View>
         </View>
