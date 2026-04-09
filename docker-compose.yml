@@ -4,7 +4,7 @@ networks:
     driver: bridge
 
 volumes:
-  db_data:        # Persistent SQLite volume — shared across services
+  db_data:        # Persistent SQLite volume
 
 services:
 
@@ -77,14 +77,13 @@ services:
     networks:
       - hackzion_net
     volumes:
-      - db_data:/data                  # ✅ Fixed (from previous session)
+      - db_data:/data          # ✅ FIX: mount shared DB volume
     environment:
       - PYTHONUNBUFFERED=1
-      - DB_PATH=/data/hackzion.db      # ✅ Fixed (from previous session)
+      - DB_PATH=/data/hackzion.db   # ✅ FIX: consistent DB path
     restart: unless-stopped
     ports:
-      - "8001:8001"
-
+      - "8001:8001"    # Exposed for direct curl access during testing (remove in production)
   # ── Response Engine ──────────────────────────────────────────────
   response:
     build:
@@ -101,15 +100,15 @@ services:
       - DB_PATH=/data/hackzion.db
     restart: unless-stopped
     ports:
-      - "8002:8002"
+      - "8002:8002"    # Exposed for direct curl access during testing
 
   # ── API Service ──────────────────────────────────────────────────
   api:
     build:
       context: .
       dockerfile: ./api/Dockerfile
-    expose:
-      - "8003"
+    ports:
+      - "8003:8003"    # Exposed for direct curl access during testing
     networks:
       - hackzion_net
     volumes:
@@ -117,19 +116,4 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DB_PATH=/data/hackzion.db
-    restart: unless-stopped
-    ports:
-      - "8003:8003"
-
-  # ── Monitor App (Expo Web → nginx) ───────────────────────────────
-  monitorapp:
-    build:
-      context: .
-      dockerfile: ./monitorapp/Dockerfile
-    ports:
-      - "3000:3000"                    # Access dashboard at http://localhost:3000
-    networks:
-      - hackzion_net
-    depends_on:
-      - api
     restart: unless-stopped

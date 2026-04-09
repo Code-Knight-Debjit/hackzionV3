@@ -6,6 +6,7 @@ Reads from SQLite. Proxies block actions to gateway.
 
 import time
 import httpx
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +14,8 @@ from pydantic import BaseModel
 
 import sys, os
 sys.path.insert(0, "/app")
+
+logger = logging.getLogger("honeypot.events")
 
 from database.db import (
     init_db,
@@ -151,6 +154,24 @@ async def stats():
             attack_type_counts.items(), key=lambda x: x[1], reverse=True
         )[:5],
     }
+
+@app.get("/api/attacks")
+async def attacks():
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            attack_resp = await client.get("http://detection:8001/sessions")
+            return attack_resp.json()
+    except Exception as e:
+        logger.error(f"Pipeline error: {e}")
+
+@app.get("/api/defence")
+async def defence():
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            defence_resp = await client.get("http://response:8002/alerts")
+            return defence_resp.json()
+    except Exception as e:
+        logger.error(f"Pipeline error: {e}")
 
 
 @app.get("/health")
