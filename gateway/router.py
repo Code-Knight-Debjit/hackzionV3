@@ -184,39 +184,29 @@ async def risk_escalate(payload: dict):
 
 # ── Live API endpoints for monitorapp ─────────────────────────────────────────
 
+API_SERVICE_URL = "http://api:8003"
+
+@routing_router.get("/api/attacks/live")
+async def gw_attacks_live(limit: int = 50):
+    r = await _client.get(f"{API_SERVICE_URL}/api/attacks/live", params={"limit": limit})
+    return r.json()
+
+@routing_router.get("/api/attacks/{session_id}")
+async def gw_attack_session(session_id: str):
+    r = await _client.get(f"{API_SERVICE_URL}/api/attacks/{session_id}")
+    return r.json()
+
 @routing_router.get("/api/alerts")
-async def api_alerts():
-    try:
-        r = await _client.get(f"{RESPONSE_URL}/alerts")
-        return r.json()
-    except Exception:
-        return []
+async def gw_alerts():
+    r = await _client.get(f"{API_SERVICE_URL}/api/alerts")
+    return r.json()
 
+@routing_router.post("/api/action/block")
+async def gw_block(payload: dict):
+    r = await _client.post(f"{API_SERVICE_URL}/api/action/block", json=payload)
+    return r.json()
 
-@routing_router.get("/api/defense-logs")
-async def api_defense_logs():
-    try:
-        r = await _client.get(f"{RESPONSE_URL}/defense-logs")
-        return r.json()
-    except Exception:
-        return []
-
-
-@routing_router.get("/api/attacks")
-async def api_attacks():
-    try:
-        r = await _client.get(f"{DETECTION_URL}/sessions")
-        sessions = r.json()
-        logs = []
-        for ip, session in sessions.items():
-            for event in session.get("events", [])[-5:]:
-                logs.append({
-                    "time":     __import__("time").strftime(
-                        "%H:%M", __import__("time").localtime(event.get("ts", 0))
-                    ),
-                    "attack":   session.get("attack_type", "Unknown"),
-                    "severity": session.get("severity", "Low").title(),
-                })
-        return logs
-    except Exception:
-        return []
+@routing_router.get("/api/stats")
+async def gw_stats():
+    r = await _client.get(f"{API_SERVICE_URL}/api/stats")
+    return r.json()
