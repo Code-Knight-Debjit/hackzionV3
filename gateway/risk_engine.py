@@ -102,3 +102,15 @@ def get_store_snapshot() -> dict:
             ip: {"score": data["score"], "last_seen": data["last_seen"]}
             for ip, data in risk_store.items()
         }
+    
+def force_escalate(ip: str, increment: int = 30):
+    """
+    Called by the response engine to permanently push an IP's score
+    above the honeypot threshold, ensuring all future requests are trapped.
+    """
+    with _lock:
+        now = __import__("time").time()
+        if ip not in risk_store:
+            risk_store[ip] = {"score": 0, "last_seen": now}
+        risk_store[ip]["score"] += increment
+        risk_store[ip]["last_seen"] = now
