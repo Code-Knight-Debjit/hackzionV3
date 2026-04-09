@@ -1,10 +1,10 @@
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
-import HomeScreen from "./screens/HomeScreen";
-import MainScreen from "./screens/MainScreen";
-import AttacksScreen from "./screens/AttacksScreen";
-import DefenseScreen from "./screens/DefenseScreen";
-import AlertsScreen from "./screens/AlertsScreen";
+import HomeScreen from "./src/screens/HomeScreen";
+import MainScreen from "./src/screens/MainScreen";
+import AttacksScreen from "./src/screens/AttacksScreen";
+import DefenseScreen from "./src/screens/DefenseScreen";
+import AlertsScreen from "./src/screens/AlertsScreen";
 
 const navigator = createStackNavigator(
   {
