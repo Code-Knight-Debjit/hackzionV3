@@ -4,7 +4,7 @@ networks:
     driver: bridge
 
 volumes:
-  db_data:        # Persistent SQLite volume
+  db_data:        # Persistent SQLite volume — shared across services
 
 services:
 
@@ -76,11 +76,14 @@ services:
       - "8001"
     networks:
       - hackzion_net
+    volumes:
+      - db_data:/data                  # ✅ Fixed (from previous session)
     environment:
       - PYTHONUNBUFFERED=1
+      - DB_PATH=/data/hackzion.db      # ✅ Fixed (from previous session)
     restart: unless-stopped
     ports:
-      - "8001:8001"    # Exposed for direct curl access during testing
+      - "8001:8001"
 
   # ── Response Engine ──────────────────────────────────────────────
   response:
@@ -98,15 +101,15 @@ services:
       - DB_PATH=/data/hackzion.db
     restart: unless-stopped
     ports:
-      - "8002:8002"    # Exposed for direct curl access during testing
+      - "8002:8002"
 
   # ── API Service ──────────────────────────────────────────────────
   api:
     build:
       context: .
       dockerfile: ./api/Dockerfile
-    ports:
-      - "8003:8003"    # Exposed for direct curl access during testing
+    expose:
+      - "8003"
     networks:
       - hackzion_net
     volumes:
@@ -114,4 +117,19 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DB_PATH=/data/hackzion.db
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+
+  # ── Monitor App (Expo Web → nginx) ───────────────────────────────
+  monitorapp:
+    build:
+      context: .
+      dockerfile: ./monitorapp/Dockerfile
+    ports:
+      - "3000:3000"                    # Access dashboard at http://localhost:3000
+    networks:
+      - hackzion_net
+    depends_on:
+      - api
     restart: unless-stopped

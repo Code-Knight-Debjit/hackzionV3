@@ -10,6 +10,7 @@ import hashlib
 import json
 import logging
 import time
+import threading
 import uuid
 
 _stdout_logger = logging.getLogger("hackzion.events")
@@ -166,18 +167,17 @@ async def log_event_async(data: dict):
 
 def log_event(data: dict):
     """
-    Sync wrapper — safe to call from anywhere.
-    Schedules async DB write without blocking caller.
+    Sync wrapper — safe to call from any context including inside FastAPI.
+    Runs the async DB write in a background thread to avoid event loop conflicts.
     """
     _stdout_logger.info(json.dumps(data))
-    if _db_available:
+    if not _db_available:
+        return
+
+    def _run():
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                asyncio.ensure_future(_db_insert_event(data))
-            else:
-                loop.run_until_complete(_db_insert_event(data))
-        except RuntimeError:
             asyncio.run(_db_insert_event(data))
         except Exception as e:
             _stdout_logger.error(f"DB write failed: {e}")
+
+    threading.Thread(target=_run, daemon=True).start()
