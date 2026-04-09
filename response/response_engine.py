@@ -12,13 +12,19 @@ Severity → Action:
 import time
 import logging
 import httpx
+import asyncio, sys
 
 logger = logging.getLogger("response.engine")
 
 GATEWAY_URL    = "http://gateway:8000"
 ALERT_STORE: list[dict] = []    # In-memory alert log (exposed via API)
 
-
+sys.path.insert(0, "/app")
+try:
+    from database.db import insert_alert as _db_insert_alert
+    _db_available = True
+except ImportError:
+    _db_available = False
 # ── Actions ───────────────────────────────────────────────────────────────────
 
 def ignore(analysis: dict) -> dict:
@@ -65,21 +71,30 @@ async def redirect_to_honeypot(analysis: dict) -> dict:
 
 
 def trigger_alert(analysis: dict) -> dict:
-    """Push alert to in-memory store (consumed by monitorapp via /api/alerts)."""
     alert = {
         "id":          len(ALERT_STORE) + 1,
         "name":        analysis.get("attack_type", "Unknown Attack"),
         "severity":    "Critical",
         "timestamp":   time.strftime("%H:%M"),
+        "ts":          time.time(),
         "ip":          analysis.get("ip"),
         "mitre_ttps":  analysis.get("mitre_ttps", []),
         "event_count": analysis.get("event_count", 0),
     }
     ALERT_STORE.append(alert)
     logger.critical(
-        f"[ALERT] {alert['name']} from {alert['ip']} | "
-        f"TTPs: {alert['mitre_ttps']}"
+        f"[ALERT] {alert['name']} from {alert['ip']} | TTPs: {alert['mitre_ttps']}"
     )
+    # Persist to DB
+    if _db_available:
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                asyncio.ensure_future(_db_insert_alert(alert))
+            else:
+                loop.run_until_complete(_db_insert_alert(alert))
+        except Exception:
+            pass
     return alert
 
 
