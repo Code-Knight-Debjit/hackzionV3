@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     subheading: {
-        color: "#FF6B6B",
+        color: "#00BFFF",
         fontSize: 18,
         textAlign: "center",
         marginBottom: 40,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: "#2a3038",
         color: "#FFFFFF",
-        borderColor: "#FF6B6B",
+        borderColor: "#00BFFF",
         borderWidth: 1,
         padding: 15,
         marginBottom: 20,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     loginButton: {
-        backgroundColor: "#FF6B6B",
+        backgroundColor: "#00BFFF",
         padding: 15,
         borderRadius: 5,
         alignItems: "center",
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     credentialsText: {
-        color: "#FF6B6B",
+        color: "#00BFFF",
         fontSize: 14,
         fontWeight: "bold",
         marginTop: 20,

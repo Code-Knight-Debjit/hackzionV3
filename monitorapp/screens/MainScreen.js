@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Text, StyleSheet, View, TouchableOpacity, Alert } from "react-native";
+import React from "react";
+import { Text, StyleSheet, View, TouchableOpacity, ScrollView } from "react-native";
 import Feather from '@expo/vector-icons/Feather';
 
 const MainScreen = ({ navigation }) => {
@@ -9,68 +9,74 @@ const MainScreen = ({ navigation }) => {
         { name: "Buffer Overflow", severity: "Critical", timestamp: "11:00" },
     ];
 
-    useEffect(() => {
-        if (highVulnAttacks.length > 0) {
-            Alert.alert(
-                "High Vulnerability Attack Detected",
-                `${highVulnAttacks.length} critical attacks detected!`,
-                [{ text: "Acknowledged" }]
-            );
-        }
-    }, []);
+    const systemMetrics = [
+        { label: "CPU Usage", value: "62%" },
+        { label: "Memory", value: "7.4 GB" },
+        { label: "Connections", value: "128" },
+        { label: "Last Scan", value: "2 min ago" },
+    ];
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Home')}
-                >
-                    <Feather name="log-out" size={24} color="black" />
+            <View style={styles.topBar}>
+                <View>
+                    <Text style={styles.title}>CyberPulse Dashboard</Text>
+                    <Text style={styles.subtitle}>Real-time server and security status</Text>
+                </View>
+                <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Home')}>
+                    <Feather name="log-out" size={22} color="#ffffff" />
                 </TouchableOpacity>
             </View>
-            <View style={styles.content}>
-                <Text style={styles.contentTitle}>Dashboard</Text>
-                <Text style={styles.welcomeText}>Welcome to CyberPulse Security Monitor</Text>
 
-                {highVulnAttacks.length > 0 && (
-                    <View style={styles.alertSection}>
-                        <Text style={styles.alertTitle}>⚠️ High Vulnerability Attacks Detected</Text>
-                        <Text style={styles.alertCount}>{highVulnAttacks.length} critical attacks found</Text>
-                        <TouchableOpacity
-                            style={styles.alertButton}
-                            onPress={() => navigation.navigate('Alerts')}
-                        >
-                            <Text style={styles.alertButtonText}>Click here to view them</Text>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                <View style={styles.statusRow}>
+                    <View style={styles.statusCard}>
+                        <Text style={styles.cardTitle}>Server Status</Text>
+                        <View style={styles.statusLine}>
+                            <View style={styles.statusDot} />
+                            <Text style={styles.statusText}>Active</Text>
+                        </View>
+                        <Text style={styles.statusDetail}>Uptime: 18h 24m</Text>
+                        <Text style={styles.statusDetail}>CPU threshold safe</Text>
+                    </View>
+                    <View style={[styles.statusCard, styles.metricsCard]}>
+                        <Text style={styles.cardTitle}>Security Alert</Text>
+                        <Text style={styles.alertValue}>{highVulnAttacks.length}</Text>
+                        <Text style={styles.alertLabel}>High vulnerability attacks</Text>
+                        <TouchableOpacity style={styles.viewButton} onPress={() => navigation.navigate('Alerts')}>
+                            <Text style={styles.viewButtonText}>View Alerts</Text>
                         </TouchableOpacity>
                     </View>
-                )}
-            </View>
+                </View>
 
-            <View style={styles.bottomNav}>
-                <TouchableOpacity
-                    style={[styles.navButton, styles.navButtonActive]}
-                >
-                    <Text style={[styles.navText, styles.navTextActive]}>HOME</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.navButton}
-                    onPress={() => navigation.navigate('Attacks')}
-                >
-                    <Text style={styles.navText}>ATTACKS</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.navButton}
-                    onPress={() => navigation.navigate('Defense')}
-                >
-                    <Text style={styles.navText}>DEFENSE</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.navButton}
-                    onPress={() => navigation.navigate('Alerts')}
-                >
-                    <Text style={styles.navText}>ALERTS</Text>
-                </TouchableOpacity>
-            </View>
+                <View style={styles.infoCard}>
+                    <View style={styles.infoHeader}>
+                        <Text style={styles.infoTitle}>Important Notes</Text>
+                        <Text style={styles.infoTag}>MAINTENANCE</Text>
+                    </View>
+                    <Text style={styles.infoText}>There are 3 critical attacks detected by the system. Review the alert log and apply firewall rules immediately. System health is stable, but keep monitoring incoming traffic patterns.</Text>
+                </View>
+
+                <View style={styles.quickActions}> 
+                    <Text style={styles.sectionTitle}>Quick Actions</Text>
+                    <View style={styles.actionRow}>
+                        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Attacks')}>
+                            <Feather name="shield" size={20} color="#00BFFF" />
+                            <Text style={styles.actionText}>Attack Logs</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Defense')}>
+                            <Feather name="shield-off" size={20} color="#00BFFF" />
+                            <Text style={styles.actionText}>Defense Logs</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.actionRowSingle}>
+                        <TouchableOpacity style={[styles.actionButton, styles.actionButtonFull]} onPress={() => navigation.navigate('Alerts')}>
+                            <Feather name="alert-circle" size={20} color="#00BFFF" />
+                            <Text style={styles.actionText}>Alerts</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ScrollView>
         </View>
     );
 };
@@ -78,102 +84,191 @@ const MainScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#FAF9F6",
+        backgroundColor: '#10141a',
+        paddingTop: 20
     },
-    header: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
+    topBar: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         padding: 20,
-        paddingTop: 40,
+    },
+    title: {
+        color: '#FFFFFF',
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
+    subtitle: {
+        color: '#A0A6B5',
+        fontSize: 14,
+        marginTop: 6,
     },
     logoutButton: {
-        backgroundColor: "#FF6B6B",
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    scrollContent: {
         paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 5,
+        paddingBottom: 30,
     },
-    logoutIcon: {
-        fontSize: 24,
-        color: "white",
+    statusRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
     },
-    content: {
+    statusCard: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        backgroundColor: '#191d26',
+        borderRadius: 18,
         padding: 20,
+        marginRight: 10,
+        minHeight: 150,
     },
-    contentTitle: {
-        fontSize: 28,
-        fontWeight: "bold",
-        color: "#FF6B6B",
-        marginBottom: 15,
-        marginTop: -100,
+    metricsCard: {
+        marginRight: 0,
+        marginLeft: 10,
+        backgroundColor: '#1f2735',
     },
-    welcomeText: {
-        fontSize: 16,
-        color: "#666",
-        textAlign: "center",
-        marginBottom: 30,
+    cardTitle: {
+        color: '#A0A6B5',
+        fontSize: 13,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        marginBottom: 16,
     },
-    alertSection: {
-        backgroundColor: "#FF6B6B",
-        padding: 20,
-        borderRadius: 10,
-        width: "100%",
-        maxWidth: 350,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 3,
-        elevation: 5,
+    statusLine: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
     },
-    alertTitle: {
+    statusDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#4CF786',
+        marginRight: 10,
+    },
+    statusText: {
+        color: '#FFFFFF',
         fontSize: 18,
-        color: "white",
-        fontWeight: "bold",
+        fontWeight: '700',
+    },
+    statusDetail: {
+        color: '#8b97ad',
+        fontSize: 13,
+        marginBottom: 4,
+    },
+    alertValue: {
+        color: '#FF6B6B',
+        fontSize: 42,
+        fontWeight: 'bold',
         marginBottom: 8,
     },
-    alertCount: {
+    alertLabel: {
+        color: '#FFFFFF',
         fontSize: 14,
-        color: "white",
-        marginBottom: 15,
-        opacity: 0.9,
+        marginBottom: 18,
     },
-    alertButton: {
-        backgroundColor: "white",
-        paddingHorizontal: 20,
+    viewButton: {
+        alignSelf: 'flex-start',
+        backgroundColor: '#0e1726',
+        paddingHorizontal: 16,
         paddingVertical: 10,
-        borderRadius: 5,
+        borderRadius: 12,
     },
-    alertButtonText: {
-        color: "#FF6B6B",
-        fontSize: 16,
-        fontWeight: "bold",
+    viewButtonText: {
+        color: '#00BFFF',
+        fontSize: 13,
+        fontWeight: '700',
     },
-    bottomNav: {
-        flexDirection: "row",
-        backgroundColor: "#2a3038",
-        borderTopWidth: 1,
-        borderTopColor: "#FF6B6B",
-        height: 60,
+    metricsGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
     },
-    navButton: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+    metricCard: {
+        width: '48%',
+        backgroundColor: '#191d26',
+        borderRadius: 18,
+        padding: 18,
+        marginBottom: 16,
     },
-    navButtonActive: {
-        borderBottomWidth: 3,
-        borderBottomColor: "#00BFFF",
+    metricValue: {
+        color: '#FFFFFF',
+        fontSize: 26,
+        fontWeight: '700',
+        marginBottom: 8,
     },
-    navText: {
-        color: "#999",
+    metricLabel: {
+        color: '#8b97ad',
         fontSize: 12,
-        fontWeight: "600",
     },
-    navTextActive: {
-        color: "#00BFFF",
+    infoCard: {
+        backgroundColor: '#1f2735',
+        borderRadius: 18,
+        padding: 20,
+        marginBottom: 20,
+    },
+    infoHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    infoTitle: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    infoTag: {
+        color: '#00BFFF',
+        fontSize: 12,
+        fontWeight: '700',
+        letterSpacing: 1,
+    },
+    infoText: {
+        color: '#8b97ad',
+        fontSize: 14,
+        lineHeight: 22,
+    },
+    quickActions: {
+        marginBottom: 30,
+    },
+    sectionTitle: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '700',
+        marginBottom: 16,
+    },
+    actionRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 12,
+    },
+    actionRowSingle: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 12,
+    },
+    actionButton: {
+        width: '48%',
+        backgroundColor: '#191d26',
+        borderRadius: 18,
+        paddingVertical: 18,
+        paddingHorizontal: 14,
+        alignItems: 'center',
+    },
+    actionButtonFull: {
+        width: '100%',
+    },
+    actionText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: '700',
+        marginTop: 10,
     },
 });
 
