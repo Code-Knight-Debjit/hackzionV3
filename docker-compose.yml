@@ -1,12 +1,14 @@
 # docker-compose.yml
-# version: "3.9"
-
 networks:
   hackzion_net:
     driver: bridge
 
+volumes:
+  db_data:        # Persistent SQLite volume
+
 services:
 
+  # ── Reverse Proxy ───────────────────────────────────────────────
   proxy:
     build:
       context: ./proxy
@@ -19,6 +21,7 @@ services:
       - hackzion_net
     restart: unless-stopped
 
+  # ── Gateway (Risk Engine + Routing) ─────────────────────────────
   gateway:
     build:
       context: .
@@ -34,8 +37,10 @@ services:
       - honeypot
       - detection
       - response
+      - api
     restart: unless-stopped
 
+  # ── Real Backend ─────────────────────────────────────────────────
   backend:
     build:
       context: ./backend
@@ -46,6 +51,7 @@ services:
       - hackzion_net
     restart: unless-stopped
 
+  # ── Honeypot ─────────────────────────────────────────────────────
   honeypot:
     build:
       context: .
@@ -54,10 +60,14 @@ services:
       - "9001"
     networks:
       - hackzion_net
+    volumes:
+      - db_data:/data
     environment:
       - PYTHONUNBUFFERED=1
+      - DB_PATH=/data/hackzion.db
     restart: unless-stopped
 
+  # ── Detection Engine ─────────────────────────────────────────────
   detection:
     build:
       context: .
@@ -70,8 +80,9 @@ services:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
     ports:
-      - "8001:8001"
+      - "8001:8001"    # Exposed for direct curl access during testing
 
+  # ── Response Engine ──────────────────────────────────────────────
   response:
     build:
       context: .
@@ -80,8 +91,27 @@ services:
       - "8002"
     networks:
       - hackzion_net
+    volumes:
+      - db_data:/data
     environment:
       - PYTHONUNBUFFERED=1
+      - DB_PATH=/data/hackzion.db
     restart: unless-stopped
     ports:
-      - "8002:8002"
+      - "8002:8002"    # Exposed for direct curl access during testing
+
+  # ── API Service ──────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    ports:
+      - "8003:8003"    # Exposed for direct curl access during testing
+    networks:
+      - hackzion_net
+    volumes:
+      - db_data:/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DB_PATH=/data/hackzion.db
+    restart: unless-stopped
