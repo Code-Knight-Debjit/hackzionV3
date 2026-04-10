@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, StyleSheet, View, FlatList, TouchableOpacity, Animated, SectionList } from "react-native";
-import logs from "./api/logs";
+import defenceapi from "./api/defenceapi";
 
 const getSeverityColor = (severity) => {
   switch (severity?.toLowerCase()) {
@@ -123,15 +123,15 @@ const DefenseScreen = ({ navigation }) => {
     setError(null);
 
     const [defenceRes, attacksRes] = await Promise.all([
-      logs.get('/defence'),
-      logs.get('/attacks'),
+      defenceapi.get('/defence'),
+      defenceapi.get('/attacks/live'),
     ]);
 
     // /defence returns a flat array
     const defenceData = defenceRes.data;
     setAlerts(Array.isArray(defenceData) ? defenceData : Object.values(defenceData));
 
-    // /attacks returns { active: [], completed: [], summary: {} }
+    // /attacks/live returns recent attacks
     const attacksData = attacksRes.data;
     const active = Array.isArray(attacksData.active) ? attacksData.active : [];
     const completed = Array.isArray(attacksData.completed) ? attacksData.completed : [];
@@ -164,11 +164,7 @@ const DefenseScreen = ({ navigation }) => {
   const renderSectionHeader = ({ section }) => {
     if (section.title === 'defended') {
       return (
-        <View style={styles.sectionHeader}>
-          <PulsingDot />
-          <Text style={styles.sectionTitleGreen}>
-            Defended Attacks — {defendedIps.length} IP{defendedIps.length !== 1 ? 's' : ''} blocked
-          </Text>
+        <View>
         </View>
       );
     }
@@ -194,16 +190,6 @@ const DefenseScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Defense</Text>
-        <Text style={styles.headerSubtitle}>
-          {defendedIps.length} blocked · {alerts.length} log{alerts.length !== 1 ? 's' : ''}
-        </Text>
-      </View>
-
-      <View style={styles.topBanner}>
-        <PulsingDot />
-        <Text style={styles.topBannerText}>
-          {defendedIps.length} IP{defendedIps.length !== 1 ? 's' : ''} successfully defended.
-        </Text>
       </View>
 
       {error ? (
@@ -235,6 +221,9 @@ const DefenseScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Alerts')}>
           <Text style={styles.navText}>ALERTS</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Profile')}>
+            <Text style={styles.navText}>PROFILE</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -244,7 +233,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#10141a" },
   centered: { flex: 1, alignItems: "center", justifyContent: "center" },
   header: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 8 },
-  headerTitle: { fontSize: 24, fontWeight: "bold", color: "#5bf67c", marginBottom: 2 },
+  headerTitle: { fontSize: 24, fontWeight: "bold", color: "#5bf67c", marginTop: 20, marginBottom: -10 },
   headerSubtitle: { fontSize: 12, color: "#8b97ad" },
   topBanner: {
     flexDirection: "row", alignItems: "center", backgroundColor: "#0a2e12",

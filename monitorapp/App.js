@@ -5,6 +5,7 @@ import MainScreen from "./src/screens/MainScreen";
 import AttacksScreen from "./src/screens/AttacksScreen";
 import DefenseScreen from "./src/screens/DefenseScreen";
 import AlertsScreen from "./src/screens/AlertsScreen";
+import ProfileScreen from "./src/screens/ProfileScreen";
 
 const navigator = createStackNavigator(
   {
@@ -34,6 +35,12 @@ const navigator = createStackNavigator(
     },
     Alerts: {
       screen: AlertsScreen,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    Profile: {
+      screen: ProfileScreen,
       navigationOptions: {
         headerShown: false,
       },

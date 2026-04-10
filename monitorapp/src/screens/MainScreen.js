@@ -124,10 +124,14 @@ const MainScreen = ({ navigation }) => {
               <Text style={styles.actionText}>Defense Logs</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.actionRowSingle}>
-            <TouchableOpacity style={[styles.actionButton, styles.actionButtonFull]} onPress={() => navigation.navigate('Alerts')}>
+          <View style={styles.actionRow}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Alerts')}>
               <Feather name="alert-circle" size={20} color="#00BFFF" />
               <Text style={styles.actionText}>Alerts</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Profile')}>
+              <Feather name="user" size={20} color="#00BFFF" />
+              <Text style={styles.actionText}>Attacker Profile</Text>
             </TouchableOpacity>
           </View>
         </View>

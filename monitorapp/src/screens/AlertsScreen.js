@@ -53,6 +53,9 @@ const AlertsScreen = ({ navigation }) => {
                 >
                     <Text style={[styles.navText, styles.navTextActive]}>ALERTS</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Profile')}>
+                    <Text style={styles.navText}>PROFILE</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
