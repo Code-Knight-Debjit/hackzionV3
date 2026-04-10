@@ -155,12 +155,48 @@ async def stats():
         )[:5],
     }
 
-@app.get("/api/attacks")
+@app.get("/api/attacks/critical")
 async def attacks():
     try:
         async with httpx.AsyncClient(timeout=2.0) as client:
-            attack_resp = await client.get("http://detection:8001/sessions")
+            attack_resp = await client.get("http://localhost:8004/attacks?severity=Critical")
             return attack_resp.json()
+    except Exception as e:
+        logger.error(f"Pipeline error: {e}")
+
+@app.get("/api/attacks/low")
+async def attacks():
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            attack_resp = await client.get("http://localhost:8004/attacks?severity=Low")
+            return attack_resp.json()
+    except Exception as e:
+        logger.error(f"Pipeline error: {e}")
+
+@app.get("/api/attacks/medium")
+async def attacks():
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            attack_resp = await client.get("http://localhost:8004/attacks?severity=Medium")
+            return attack_resp.json()
+    except Exception as e:
+        logger.error(f"Pipeline error: {e}")
+
+@app.get("/api/attacks/high")
+async def attacks():
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            attack_resp = await client.get("http://localhost:8004/attacks?severity=High")
+            return attack_resp.json()
+    except Exception as e:
+        logger.error(f"Pipeline error: {e}")
+
+@app.get("/api/profiles")
+async def profiles():
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            profile_resp = await client.get("http://localhost:8004/profiles")
+            return profile_resp.json()
     except Exception as e:
         logger.error(f"Pipeline error: {e}")
 

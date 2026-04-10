@@ -4,116 +4,91 @@ networks:
     driver: bridge
 
 volumes:
-  db_data:        # Persistent SQLite volume
+  db_data:      # SQLite — existing services
+  mongo_data:   # MongoDB — ai_analyzer
+  ollama_data:  # Ollama model weights
 
 services:
 
-  # ── Reverse Proxy ───────────────────────────────────────────────
   proxy:
-    build:
-      context: ./proxy
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - gateway
-    networks:
-      - hackzion_net
+    build: { context: ./proxy, dockerfile: Dockerfile }
+    ports: ["80:80"]
+    depends_on: [gateway]
+    networks: [hackzion_net]
     restart: unless-stopped
 
-  # ── Gateway (Risk Engine + Routing) ─────────────────────────────
   gateway:
-    build:
-      context: .
-      dockerfile: ./gateway/Dockerfile
-    expose:
-      - "8000"
-    networks:
-      - hackzion_net
-    environment:
-      - PYTHONUNBUFFERED=1
-    depends_on:
-      - backend
-      - honeypot
-      - detection
-      - response
-      - api
+    build: { context: ., dockerfile: ./gateway/Dockerfile }
+    expose: ["8000"]
+    networks: [hackzion_net]
+    environment: [PYTHONUNBUFFERED=1]
+    depends_on: [backend, honeypot, detection, response, api, ai_analyzer]
     restart: unless-stopped
 
-  # ── Real Backend ─────────────────────────────────────────────────
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    expose:
-      - "9000"
-    networks:
-      - hackzion_net
+    build: { context: ./backend, dockerfile: Dockerfile }
+    expose: ["9000"]
+    networks: [hackzion_net]
     restart: unless-stopped
 
-  # ── Honeypot ─────────────────────────────────────────────────────
   honeypot:
-    build:
-      context: .
-      dockerfile: ./honeypot/Dockerfile
-    expose:
-      - "9001"
-    networks:
-      - hackzion_net
-    volumes:
-      - db_data:/data
-    environment:
-      - PYTHONUNBUFFERED=1
-      - DB_PATH=/data/hackzion.db
+    build: { context: ., dockerfile: ./honeypot/Dockerfile }
+    expose: ["9001"]
+    volumes: [db_data:/data]
+    networks: [hackzion_net]
+    environment: [PYTHONUNBUFFERED=1, DB_PATH=/data/hackzion.db]
     restart: unless-stopped
 
-  # ── Detection Engine ─────────────────────────────────────────────
   detection:
-    build:
-      context: .
-      dockerfile: ./detection/Dockerfile
-    expose:
-      - "8001"
-    networks:
-      - hackzion_net
-    volumes:
-      - db_data:/data          # ✅ FIX: mount shared DB volume
-    environment:
-      - PYTHONUNBUFFERED=1
-      - DB_PATH=/data/hackzion.db   # ✅ FIX: consistent DB path
+    build: { context: ., dockerfile: ./detection/Dockerfile }
+    ports: ["8001:8001"]
+    volumes: [db_data:/data]
+    networks: [hackzion_net]
+    environment: [PYTHONUNBUFFERED=1, DB_PATH=/data/hackzion.db]
     restart: unless-stopped
-    ports:
-      - "8001:8001"    # Exposed for direct curl access during testing (remove in production)
-  # ── Response Engine ──────────────────────────────────────────────
-  response:
-    build:
-      context: .
-      dockerfile: ./response/Dockerfile
-    expose:
-      - "8002"
-    networks:
-      - hackzion_net
-    volumes:
-      - db_data:/data
-    environment:
-      - PYTHONUNBUFFERED=1
-      - DB_PATH=/data/hackzion.db
-    restart: unless-stopped
-    ports:
-      - "8002:8002"    # Exposed for direct curl access during testing
 
-  # ── API Service ──────────────────────────────────────────────────
+  response:
+    build: { context: ., dockerfile: ./response/Dockerfile }
+    ports: ["8002:8002"]
+    volumes: [db_data:/data]
+    networks: [hackzion_net]
+    environment: [PYTHONUNBUFFERED=1, DB_PATH=/data/hackzion.db]
+    restart: unless-stopped
+
   api:
-    build:
-      context: .
-      dockerfile: ./api/Dockerfile
-    ports:
-      - "8003:8003"    # Exposed for direct curl access during testing
-    networks:
-      - hackzion_net
-    volumes:
-      - db_data:/data
+    build: { context: ., dockerfile: ./api/Dockerfile }
+    ports: ["8003:8003"]
+    volumes: [db_data:/data]
+    networks: [hackzion_net]
+    environment: [PYTHONUNBUFFERED=1, DB_PATH=/data/hackzion.db]
+    restart: unless-stopped
+
+  # ── AI Analyzer (LLM + MongoDB) ──────────────────────────────────
+  ai_analyzer:
+    build: { context: ., dockerfile: ./ai_analyzer/Dockerfile }
+    ports: ["8004:8004"]
+    networks: [hackzion_net]
     environment:
       - PYTHONUNBUFFERED=1
-      - DB_PATH=/data/hackzion.db
+      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_DB=hackzion
+      - ALERT_API_URL=
+      - ALERT_API_KEY=
+    depends_on: [mongo, ollama]
+    restart: unless-stopped
+
+  # ── MongoDB ───────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    ports: ["27017:27017"]
+    volumes: [mongo_data:/data/db]
+    networks: [hackzion_net]
+    restart: unless-stopped
+
+  # ── Ollama (Llama3) ───────────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    ports: ["11434:11434"]
+    volumes: [ollama_data:/root/.ollama]
+    networks: [hackzion_net]
     restart: unless-stopped

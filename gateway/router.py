@@ -13,6 +13,7 @@ BACKEND_URL   = "http://backend:9000"
 HONEYPOT_URL  = "http://honeypot:9001"
 DETECTION_URL = "http://detection:8001"
 RESPONSE_URL  = "http://response:8002"
+AI_ANALYZER_URL = "http://ai_analyzer:8004"
 
 # Shared async HTTP client (connection pooling)
 _client = httpx.AsyncClient(timeout=10.0)
@@ -186,10 +187,31 @@ async def risk_escalate(payload: dict):
 
 API_SERVICE_URL = "http://api:8003"
 
+@routing_router.get("/api/attacks")
+async def gw_attacks():
+    """
+    Proxy to AI Analyzer /attacks.
+    Returns all attacks from MongoDB — updated live on every honeypot hit.
+    """
+    try:
+        r = await _client.get(f"{AI_ANALYZER_URL}/attacks", timeout=5.0)
+        return r.json()
+    except Exception as e:
+        return {"count": 0, "attacks": [], "error": str(e)}
+
+
 @routing_router.get("/api/attacks/live")
 async def gw_attacks_live(limit: int = 50):
-    r = await _client.get(f"{API_SERVICE_URL}/api/attacks/live", params={"limit": limit})
-    return r.json()
+    """Live attacks — most recent N, from MongoDB via AI Analyzer."""
+    try:
+        r = await _client.get(
+            f"{AI_ANALYZER_URL}/attacks",
+            params={"limit": limit},
+            timeout=5.0,
+        )
+        return r.json()
+    except Exception as e:
+        return {"count": 0, "attacks": [], "error": str(e)}
 
 @routing_router.get("/api/attacks/{session_id}")
 async def gw_attack_session(session_id: str):
